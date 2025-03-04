@@ -1,5 +1,4 @@
 "use client"
-
 import { useState } from "react"
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router"
 import { AnimatePresence } from "framer-motion"
