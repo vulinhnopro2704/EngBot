@@ -48,7 +48,6 @@ const Navbar = ({ toggleSidebar, toggleAdminMode, isAdmin }) => {
                   >
                     <Bell className="h-6 w-6" />
                   </motion.button>
-
                   <div className="ml-3 relative">
                     <div>
                       <button
