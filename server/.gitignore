@@ -1,0 +1,10 @@
+# Bỏ qua môi trường ảo
+venv/
+*.pyc
+__pycache__/
+
+# Bỏ qua file cấu hình môi trường
+.env
+
+# Bỏ qua database SQLite (nếu dùng SQLite)
+db.sqlite3
