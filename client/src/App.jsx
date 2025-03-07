@@ -35,7 +35,7 @@ const CreateBlogPostPage = lazy(() => import("./pages/CreateBlogPostPage"));
 
 // Lazy import các component admin
 const AdminLayout = lazy(() => import("./components/admin/AdminLayout"));
-const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
+const AdminDashboard = lazy(() => import("./pages/admin/AdminDashBoard"));
 const AdminUsers = lazy(() => import("./pages/admin/AdminUsers"));
 const AdminContent = lazy(() => import("./pages/admin/AdminContent"));
 const AdminSettings = lazy(() => import("./pages/admin/AdminSettings"));
