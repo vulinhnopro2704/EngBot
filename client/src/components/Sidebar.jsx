@@ -73,8 +73,8 @@ const Sidebar = ({ open, toggleSidebar, isAdmin }) => {
             key={item.path}
             to={item.path}
             className={`group flex items-center px-2 py-2 text-base font-medium rounded-md transition-colors duration-200 ${isActive(item.path)
-              ? "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400"
-              : "text-gray-600 dark:text-gray-300 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 hover:text-emerald-600 dark:hover:text-emerald-400"
+                ? "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400"
+                : "text-gray-600 dark:text-gray-300 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 hover:text-emerald-600 dark:hover:text-emerald-400"
               }`}
           >
             <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} className="mr-4">
