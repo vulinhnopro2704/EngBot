@@ -101,7 +101,7 @@ export function AppLayout({ children }: AppLayoutProps) {
 					<div className="flex min-h-screen w-full">
 						<Sidebar
 							variant="inset"
-							className="hidden min-w-[300px] md:flex"
+							className="hidden min-w-[150px] md:flex"
 						>
 							<SidebarHeader className="flex flex-col items-center justify-center py-6">
 								<motion.div
@@ -115,7 +115,7 @@ export function AppLayout({ children }: AppLayoutProps) {
 									className="text-xl md:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-indigo-500"
 									whileHover={{ scale: 1.05 }}
 								>
-									VocabMaster
+									EngBot
 								</motion.h1>
 							</SidebarHeader>
 							<SidebarContent>
@@ -161,7 +161,7 @@ export function AppLayout({ children }: AppLayoutProps) {
 							<SidebarRail />
 						</Sidebar>
 
-						<SidebarInset className="flex lg:ml-[400px] flex-col w-full">
+						<SidebarInset className="flex lg:ml-[250px] flex-col w-full">
 							<header className="h-14 sm:h-16 md:h-18 border-b flex items-center justify-between px-3 sm:px-4 md:px-6">
 								<div className="flex items-center gap-1 sm:gap-2">
 									<SidebarTrigger className="hidden md:flex" />
@@ -180,7 +180,7 @@ export function AppLayout({ children }: AppLayoutProps) {
 											? "Notebook"
 											: pathname.startsWith("/settings")
 											? "Settings"
-											: "VocabMaster"}
+											: "EngBot"}
 									</h2>
 								</div>
 								<div className="flex items-center gap-1 sm:gap-2">

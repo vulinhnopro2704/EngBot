@@ -5,7 +5,7 @@ import { NavigationProgress } from "@/components/ui/navigation-progress";
 import "./globals.css";
 
 export const metadata: Metadata = {
-	title: "VocabMaster - Learn English Vocabulary",
+	title: "EngBot - Learn English Vocabulary",
 	description: "Interactive English vocabulary learning application",
 	generator: "v0.dev",
 };
