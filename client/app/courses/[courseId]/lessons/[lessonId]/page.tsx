@@ -1,10 +1,21 @@
-import { FullScreenLayout } from "@/components/layout/full-screen-layout"
-import { LessonPage } from "@/components/lessons/lesson-page"
+import { FullScreenLayout } from "@/components/layout/full-screen-layout";
+import { LessonPage } from "@/components/lessons/lesson-page";
 
-export default function Lesson({ params }: { params: { courseId: string; lessonId: string } }) {
-  return (
-    <FullScreenLayout>
-      <LessonPage courseId={Number.parseInt(params.courseId)} lessonId={Number.parseInt(params.lessonId)} />
-    </FullScreenLayout>
-  )
+export default async function Lesson({
+	params,
+}: {
+	params: Promise<{ courseId: string; lessonId: string }>;
+}) {
+	// Await the params
+	const resolvedParams = await params;
+
+	// Convert string params to numbers
+	const courseId = parseInt(resolvedParams.courseId);
+	const lessonId = parseInt(resolvedParams.lessonId);
+
+	return (
+		<FullScreenLayout>
+			<LessonPage courseId={courseId} lessonId={lessonId} />
+		</FullScreenLayout>
+	);
 }
