@@ -3,7 +3,7 @@
 import type React from "react";
 import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { useAuthStore } from "@/lib/auth-store";
+import { useAuthStore } from "@/lib/store/auth-store";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { ThemeChangeProvider } from "@/components/theme-provider";
 import { motion } from "framer-motion";
