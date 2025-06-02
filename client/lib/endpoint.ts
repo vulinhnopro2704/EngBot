@@ -29,10 +29,10 @@ export const ENDPOINTS = {
 			`${BACKEND_URL}/lessons/lessons_by_course/?course_id=${courseId}`,
 	},
 	USER_COURSES: {
-		BASE: `${BACKEND_URL}/user_courses`,
-		ID: (id: string): string => `${BACKEND_URL}/user_courses/${id}`,
+		BASE: `${BACKEND_URL}/user-courses`,
+		ID: (id: string): string => `${BACKEND_URL}/user-courses/${id}`,
 		COURSE_LESSONS: (courseId: string): string =>
-			`${BACKEND_URL}/user_courses/${courseId}/lessons/`,
+			`${BACKEND_URL}/user-courses/${courseId}/lessons/`,
 	},
 	USER_LESSONS: {
 		BASE: `${BACKEND_URL}/user_lessons`,

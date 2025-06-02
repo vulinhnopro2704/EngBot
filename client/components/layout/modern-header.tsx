@@ -16,6 +16,7 @@ import {
 	Flame,
 	Heart,
 	Diamond,
+	MessageSquare,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -45,6 +46,12 @@ const navigationItems = [
 		label: "Notebook",
 		path: "/notebook",
 		section: "notebook",
+	},
+	{
+		icon: MessageSquare,
+		label: "AI Chat",
+		path: "/chat",
+		section: "chat",
 	},
 ];
 

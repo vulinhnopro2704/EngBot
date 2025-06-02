@@ -4,7 +4,6 @@ import type React from "react";
 import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/store/auth-store";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { ThemeChangeProvider } from "@/components/theme-provider";
 import { motion } from "framer-motion";
 import {
@@ -16,31 +15,19 @@ import { PageTransition } from "@/components/ui/page-transition";
 import { AuthCheck } from "@/components/auth/auth-check";
 import { ModernHeader } from "@/components/layout/modern-header";
 import {
-	Sidebar,
-	SidebarContent,
-	SidebarFooter,
-	SidebarGroup,
-	SidebarGroupContent,
-	SidebarGroupLabel,
-	SidebarHeader,
 	SidebarInset,
 	SidebarMenu,
 	SidebarMenuButton,
 	SidebarMenuItem,
-	SidebarRail,
-	SidebarTrigger,
 } from "@/components/ui/sidebar";
 import {
 	Book,
-	GraduationCap,
 	LayoutDashboard,
-	LogOut,
 	Settings,
 	Brain,
 	Notebook,
+	MessageSquare,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 type AppLayoutProps = {
 	children: React.ReactNode;
@@ -78,6 +65,12 @@ export function AppLayout({ children }: AppLayoutProps) {
 			section: "notebook",
 		},
 		{
+			icon: MessageSquare,
+			label: "AI Chat",
+			path: "/chat",
+			section: "chat",
+		},
+		{
 			icon: Settings,
 			label: "Settings",
 			path: "/settings",
@@ -105,49 +98,6 @@ export function AppLayout({ children }: AppLayoutProps) {
 					<div className="min-h-screen bg-background min-w-screen">
 						<ModernHeader />
 						<SidebarInset className="flex flex-col w-full">
-							<header className="h-14 sm:h-16 md:h-18 border-b flex items-center justify-between px-3 sm:px-4 md:px-6">
-								<div className="flex items-center gap-1 sm:gap-2">
-									<SidebarTrigger className="flex" />
-									<h2 className="text-lg sm:text-xl md:text-2xl font-semibold truncate">
-										{pathname === "/"
-											? "Dashboard"
-											: pathname.startsWith("/courses")
-											? "Courses"
-											: pathname.startsWith("/practice")
-											? "Practice"
-											: pathname.startsWith("/notebook")
-											? "Notebook"
-											: pathname.startsWith("/settings")
-											? "Settings"
-											: "VocabMaster"}
-									</h2>
-								</div>
-								<div className="flex items-center gap-1 sm:gap-2">
-									<ThemeToggle className="md:hidden" />
-									<div className="md:hidden flex items-center">
-										<Avatar className="h-8 w-8 sm:h-10 sm:w-10 border-2 border-primary/20">
-											<AvatarImage
-												src={
-													user?.avatar ||
-													"/placeholder.svg"
-												}
-												alt={user?.name}
-											/>
-											<AvatarFallback>
-												{user?.name?.charAt(0) || "U"}
-											</AvatarFallback>
-										</Avatar>
-										<Button
-											variant="ghost"
-											size="sm"
-											className="ml-2"
-											onClick={handleLogout}
-										>
-											<LogOut className="h-4 w-4" />
-										</Button>
-									</div>
-								</div>
-							</header>
 							<main className="flex-1 overflow-auto p-3 sm:p-4 md:p-6 lg:p-8 w-full">
 								<PageTransition key={pathname}>
 									<SectionTransition

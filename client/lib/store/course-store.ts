@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { apiGet } from "../api-client";
 import { ENDPOINTS } from "../endpoint";
-import { Course } from "@/types/courses";
+import { Course, PaginatedCoursesResponse } from "@/types/courses";
 
 interface CourseState {
 	courses: Course[];
@@ -53,10 +53,16 @@ export const useCourseStore = create<CourseStore>((set) => ({
 	fetchUserCourses: async (): Promise<void> => {
 		try {
 			set({ isLoading: true, error: null });
-			const response = await apiGet<Course[]>(
-				ENDPOINTS.USER_COURSES.BASE
+			const response = await apiGet<PaginatedCoursesResponse>(
+				ENDPOINTS.USER_COURSES.BASE,
+				{
+					params: {
+						page: 1,
+						page_size: 100,
+					},
+				}
 			);
-			set({ userCourses: response, isLoading: false });
+			set({ userCourses: response.results, isLoading: false });
 		} catch (error) {
 			set({
 				isLoading: false,
