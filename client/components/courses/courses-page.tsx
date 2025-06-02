@@ -34,14 +34,14 @@ export function CoursesPage() {
 	const [showFilters, setShowFilters] = useState<boolean>(false);
 	const [animalType, setAnimalType] = useState<AnimalType>("quokka");
 	const {
-		courses,
-		fetchAllCourses,
+		userCourses: courses,
+		fetchUserCourses,
 		isLoading: isFetchingCourses,
 	} = useCourseStore();
 
 	useEffect(() => {
 		// Fetch all courses on mount
-		fetchAllCourses();
+		fetchUserCourses();
 	}, []);
 
 	// Simulate loading state

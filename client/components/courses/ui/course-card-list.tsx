@@ -1,11 +1,12 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Brain, ChevronRight } from "lucide-react";
+import { Brain, ChevronRight, Users, BookOpen, Calendar } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import type { Course } from "@/types/courses";
+import { formatDistanceToNow } from "date-fns";
 
 interface ListCourseCardProps {
 	course: Course;
@@ -17,11 +18,21 @@ interface ListCourseCardProps {
 
 export function ListCourseCard({
 	course,
-	progress,
+	progress: externalProgress,
 	index,
 	onSelect,
 	onPractice,
 }: ListCourseCardProps) {
+	// Use course.progress if available, otherwise fall back to the passed progress
+	const displayProgress = (
+		course.progress !== undefined ? course.progress : externalProgress
+	).toFixed(1);
+
+	// Format the updated date if available
+	const updatedDate = course.updatedAt
+		? formatDistanceToNow(new Date(course.updatedAt), { addSuffix: true })
+		: null;
+
 	return (
 		<motion.div
 			key={course.id}
@@ -47,13 +58,45 @@ export function ListCourseCard({
 								{course.icon || "📚"}
 							</div>
 						)}
+
+						{course.isLearned && (
+							<div className="absolute top-2 right-2 bg-green-500 text-white px-2 py-1 rounded-md text-xs">
+								Learning
+							</div>
+						)}
 					</div>
 
 					<div className="flex-1 p-4 md:p-6">
 						<div className="flex justify-between items-start mb-2">
-							<h3 className="font-bold text-lg md:text-xl">
-								{course.title}
-							</h3>
+							<div>
+								<h3 className="font-bold text-lg md:text-xl">
+									{course.title}
+								</h3>
+								<div className="flex gap-3 text-xs text-muted-foreground mt-1">
+									{course.lessonCount !== undefined && (
+										<div className="flex items-center">
+											<BookOpen className="h-3 w-3 mr-1" />
+											<span>
+												{course.lessonCount} lessons
+											</span>
+										</div>
+									)}
+									{course.learnerCount !== undefined && (
+										<div className="flex items-center">
+											<Users className="h-3 w-3 mr-1" />
+											<span>
+												{course.learnerCount} learners
+											</span>
+										</div>
+									)}
+									{updatedDate && (
+										<div className="flex items-center">
+											<Calendar className="h-3 w-3 mr-1" />
+											<span>{updatedDate}</span>
+										</div>
+									)}
+								</div>
+							</div>
 						</div>
 
 						<p className="text-sm md:text-base text-muted-foreground mb-4 line-clamp-2">
@@ -67,11 +110,11 @@ export function ListCourseCard({
 										Progress
 									</span>
 									<span className="font-medium">
-										{progress}%
+										{displayProgress}%
 									</span>
 								</div>
 								<Progress
-									value={progress}
+									value={+displayProgress}
 									className="h-2 md:h-3"
 								/>
 							</div>
@@ -81,10 +124,14 @@ export function ListCourseCard({
 									size="sm"
 									className="h-9 md:h-10 md:text-base"
 									variant={
-										progress > 0 ? "default" : "outline"
+										+displayProgress > 0
+											? "default"
+											: "outline"
 									}
 								>
-									{progress > 0 ? "Continue" : "Start"}{" "}
+									{+displayProgress > 0
+										? "Continue"
+										: "Start"}{" "}
 									<ChevronRight className="ml-1 h-3 w-3 md:h-4 md:w-4" />
 								</Button>
 								<Button
