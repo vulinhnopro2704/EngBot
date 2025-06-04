@@ -1,7 +1,7 @@
+import { Word } from "@/data/types";
 import { apiGet } from "@/lib/api-client";
 import { ENDPOINTS } from "@/lib/endpoint";
 import { Lesson } from "@/types/lessons";
-import { Word } from "@/types/words";
 
 export const getLessonsByCourseId = async (
 	courseId: string | number

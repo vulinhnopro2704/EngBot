@@ -18,10 +18,18 @@ import { CelebrationOverlay } from "@/components/practice/ui/celebration-overlay
 import { Button } from "@/components/ui/button"
 import { WordInfoSnackbar } from "@/components/practice/ui/word-info-snackbar"
 import { cn } from "@/lib/utils"
+import { toast } from "sonner"
 
 export function PracticeSessionSection() {
   const router = useRouter()
-  const { currentSession, answerQuestion, moveToNextQuestion, streakCount } = usePracticeStore()
+  const {
+    currentSession,
+    answerQuestion,
+    moveToNextQuestion,
+    submitReviewSession,
+    streakCount,
+    isLoading,
+  } = usePracticeStore()
   const { playAudio, speakWord } = useAudio()
 
   const [hearts, setHearts] = useState(5)
@@ -101,6 +109,59 @@ export function PracticeSessionSection() {
     setShowSkipWordInfo(false)
     setIsSkipping(false)
     moveToNextQuestion()
+  }
+
+  const handleComplete = async () => {
+    try {
+      await submitReviewSession()
+      router.push("/practice/results")
+    } catch (error) {
+      toast.error("Failed to submit review session")
+      console.error(error)
+    }
+  }
+
+  const handleNext = () => {
+    moveToNextQuestion()
+  }
+
+  // Render different question types based on the current question
+  const renderQuestion = () => {
+    // Implement your question rendering logic here
+    // For example:
+    // switch (currentQuestion.type) {
+    //   case "multiple-choice":
+    //     return <MultipleChoiceQuestion question={currentQuestion} />
+    //   case "fill-blank":
+    //     return <FillBlankQuestion question={currentQuestion} />
+    //   // ...other question types
+    //   default:
+    //     return <div>Unsupported question type</div>
+    // }
+
+    // Placeholder return:
+    return (
+      <div className="p-8 text-center">
+        <h2 className="text-2xl font-bold mb-4">
+          Question {currentSession.currentQuestionIndex + 1}/{currentSession.questions.length}
+        </h2>
+        <p className="mb-8">Question type: {currentQuestion.type}</p>
+
+        {/* This is where you would render your actual question components */}
+
+        <div className="flex justify-center gap-4 mt-8">
+          {currentSession.currentQuestionIndex === currentSession.questions.length - 1 ? (
+            <Button size="lg" onClick={handleComplete} disabled={isLoading}>
+              {isLoading ? "Submitting..." : "Complete"}
+            </Button>
+          ) : (
+            <Button size="lg" onClick={handleNext}>
+              Next
+            </Button>
+          )}
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -202,6 +263,9 @@ export function PracticeSessionSection() {
           />
         )}
       </AnimatePresence>
+
+      {/* Render question section */}
+      <div className="container max-w-4xl py-8">{renderQuestion()}</div>
     </div>
   )
 }

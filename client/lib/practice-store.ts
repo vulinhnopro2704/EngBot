@@ -2,15 +2,20 @@ import { create } from "zustand"
 import { persist } from "zustand/middleware"
 import { v4 as uuidv4 } from "uuid"
 import type { PracticeSession, PracticeQuestion, Word, QuestionType, PracticeMode } from "@/data/types"
+import { fetchReviewWords, submitReviewWords, ReviewWordItem } from "@/service/word"
 
 interface PracticeState {
   // Current practice session
   currentSession: PracticeSession | null
   sessionHistory: PracticeSession[]
 
+  // Review words data
+  reviewWordsResult: ReviewWordItem[] | null
+
   // Practice settings
   autoPlayAudio: boolean
   showHints: boolean
+  isLoading: boolean
 
   // Practice stats
   streakCount: number
@@ -19,8 +24,9 @@ interface PracticeState {
   hearts: number
 
   // Actions
-  startSession: (mode: PracticeMode, wordCount?: number) => void
+  startSession: (mode: PracticeMode, wordCount?: number) => Promise<void>
   endSession: () => void
+  submitReviewSession: () => Promise<void>
   answerQuestion: (questionId: number, answer: string) => boolean
   moveToNextQuestion: () => void
   incrementStreak: () => void
@@ -28,164 +34,11 @@ interface PracticeState {
   decrementHearts: () => void
   toggleAutoPlayAudio: () => void
   toggleShowHints: () => void
+  clearReviewWordsResult: () => void
 
-  // Mock data generation (will be replaced with API calls)
-  generateMockQuestions: (count: number, mode: PracticeMode) => PracticeQuestion[]
+  // Real data generation
+  generateQuestionsFromReviewWords: (count: number, mode: PracticeMode, reviewWords: any[]) => PracticeQuestion[]
 }
-
-// Mock data for practice
-const mockWords: Word[] = [
-  {
-    id: 1,
-    word: "ubiquitous",
-    meaning: "present, appearing, or found everywhere",
-    pronunciation: "/juːˈbɪkwɪtəs/",
-    pos: "adjective",
-    example: "Mobile phones are now ubiquitous in modern life.",
-    example_vi: "Điện thoại di động hiện nay có mặt khắp nơi trong cuộc sống hiện đại.",
-    cefr: "C1",
-  },
-  {
-    id: 2,
-    word: "ephemeral",
-    meaning: "lasting for a very short time",
-    pronunciation: "/ɪˈfem(ə)rəl/",
-    pos: "adjective",
-    example: "The ephemeral nature of fashion trends makes it hard to keep up.",
-    example_vi: "Bản chất ngắn ngủi của các xu hướng thời trang khiến việc theo kịp trở nên khó khăn.",
-    cefr: "C1",
-  },
-  {
-    id: 3,
-    word: "serendipity",
-    meaning: "the occurrence of events by chance in a happy or beneficial way",
-    pronunciation: "/ˌserənˈdɪpɪti/",
-    pos: "noun",
-    example: "The discovery of penicillin was a case of serendipity.",
-    example_vi: "Việc phát hiện ra penicillin là một trường hợp tình cờ may mắn.",
-    cefr: "C1",
-  },
-  {
-    id: 4,
-    word: "pragmatic",
-    meaning: "dealing with things sensibly and realistically",
-    pronunciation: "/præɡˈmætɪk/",
-    pos: "adjective",
-    example: "We need a pragmatic approach to solving this problem.",
-    example_vi: "Chúng ta cần một cách tiếp cận thực tế để giải quyết vấn đề này.",
-    cefr: "B2",
-  },
-  {
-    id: 5,
-    word: "meticulous",
-    meaning: "showing great attention to detail; very careful and precise",
-    pronunciation: "/məˈtɪkjʊləs/",
-    pos: "adjective",
-    example: "He is meticulous in his research.",
-    example_vi: "Anh ấy rất tỉ mỉ trong nghiên cứu của mình.",
-    cefr: "C1",
-  },
-  {
-    id: 6,
-    word: "eloquent",
-    meaning: "fluent or persuasive in speaking or writing",
-    pronunciation: "/ˈeləkwənt/",
-    pos: "adjective",
-    example: "She gave an eloquent speech at the conference.",
-    example_vi: "Cô ấy đã có một bài phát biểu lưu loát tại hội nghị.",
-    cefr: "B2",
-  },
-  {
-    id: 7,
-    word: "resilience",
-    meaning: "the capacity to recover quickly from difficulties",
-    pronunciation: "/rɪˈzɪliəns/",
-    pos: "noun",
-    example: "The resilience of the human spirit is remarkable.",
-    example_vi: "Sức mạnh phục hồi của tinh thần con người thật đáng kinh ngạc.",
-    cefr: "C1",
-  },
-  {
-    id: 8,
-    word: "ambiguous",
-    meaning: "open to more than one interpretation",
-    pronunciation: "/æmˈbɪɡjuəs/",
-    pos: "adjective",
-    example: "The ending of the film was deliberately ambiguous.",
-    example_vi: "Kết thúc của bộ phim cố tình mang tính mơ hồ.",
-    cefr: "B2",
-  },
-  {
-    id: 9,
-    word: "meticulous",
-    meaning: "showing great attention to detail; very careful and precise",
-    pronunciation: "/məˈtɪkjʊləs/",
-    pos: "adjective",
-    example: "He is meticulous in his research.",
-    example_vi: "Anh ấy rất tỉ mỉ trong nghiên cứu của mình.",
-    cefr: "C1",
-  },
-  {
-    id: 10,
-    word: "procrastinate",
-    meaning: "delay or postpone action; put off doing something",
-    pronunciation: "/prəˈkræstɪneɪt/",
-    pos: "verb",
-    example: "I always procrastinate when it comes to doing my taxes.",
-    example_vi: "Tôi luôn trì hoãn khi phải làm thuế.",
-    cefr: "B2",
-  },
-  {
-    id: 11,
-    word: "meticulous",
-    meaning: "showing great attention to detail; very careful and precise",
-    pronunciation: "/məˈtɪkjʊləs/",
-    pos: "adjective",
-    example: "He is meticulous in his research.",
-    example_vi: "Anh ấy rất tỉ mỉ trong nghiên cứu của mình.",
-    cefr: "C1",
-  },
-  {
-    id: 12,
-    word: "benevolent",
-    meaning: "well meaning and kindly",
-    pronunciation: "/bəˈnevələnt/",
-    pos: "adjective",
-    example: "A benevolent smile crossed her face.",
-    example_vi: "Một nụ cười nhân hậu hiện lên trên khuôn mặt cô ấy.",
-    cefr: "C1",
-  },
-  {
-    id: 13,
-    word: "quintessential",
-    meaning: "representing the most perfect or typical example of a quality or class",
-    pronunciation: "/ˌkwɪntɪˈsenʃəl/",
-    pos: "adjective",
-    example: "He is the quintessential English gentleman.",
-    example_vi: "Anh ấy là một quý ông Anh điển hình.",
-    cefr: "C1",
-  },
-  {
-    id: 14,
-    word: "diligent",
-    meaning: "having or showing care and conscientiousness in one's work or duties",
-    pronunciation: "/ˈdɪlɪdʒənt/",
-    pos: "adjective",
-    example: "She's a diligent worker who never misses a deadline.",
-    example_vi: "Cô ấy là một người làm việc chăm chỉ, không bao giờ bỏ lỡ thời hạn.",
-    cefr: "B2",
-  },
-  {
-    id: 15,
-    word: "meticulous",
-    meaning: "showing great attention to detail; very careful and precise",
-    pronunciation: "/məˈtɪkjʊləs/",
-    pos: "adjective",
-    example: "He is meticulous in his research.",
-    example_vi: "Anh ấy rất tỉ mỉ trong nghiên cứu của mình.",
-    cefr: "C1",
-  },
-]
 
 export const usePracticeStore = create<PracticeState>()(
   persist(
@@ -198,25 +51,47 @@ export const usePracticeStore = create<PracticeState>()(
       streakCount: 0,
       totalCorrect: 0,
       totalIncorrect: 0,
-      hearts: 5, // Changed from 3 to 5
+      hearts: 5,
+      isLoading: false,
+      reviewWordsResult: null,
 
       // Actions
-      startSession: (mode, wordCount = 10) => {
-        const questions = get().generateMockQuestions(wordCount, mode)
+      startSession: async (mode, wordCount = 10) => {
+        set({ isLoading: true })
 
-        const newSession: PracticeSession = {
-          id: uuidv4(),
-          mode,
-          questions,
-          currentQuestionIndex: 0,
-          correctAnswers: 0,
-          incorrectAnswers: 0,
-          startTime: new Date(),
-          completed: false,
-          results: [],
+        try {
+          // Fetch real review words from API
+          const response = await fetchReviewWords()
+          const reviewWords = response.words || []
+
+          // Limit to the requested word count
+          const selectedWords = reviewWords.slice(0, wordCount)
+
+          if (selectedWords.length === 0) {
+            console.error("No review words available")
+            set({ isLoading: false })
+            return
+          }
+
+          const questions = get().generateQuestionsFromReviewWords(selectedWords.length, mode, selectedWords)
+
+          const newSession: PracticeSession = {
+            id: uuidv4(),
+            mode,
+            questions,
+            currentQuestionIndex: 0,
+            correctAnswers: 0,
+            incorrectAnswers: 0,
+            startTime: new Date(),
+            completed: false,
+            results: [],
+          }
+
+          set({ currentSession: newSession, streakCount: 0, hearts: 5, isLoading: false })
+        } catch (error) {
+          console.error("Failed to fetch review words:", error)
+          set({ isLoading: false })
         }
-
-        set({ currentSession: newSession, streakCount: 0, hearts: 5 }) // Changed from 3 to 5
       },
 
       endSession: () => {
@@ -233,6 +108,40 @@ export const usePracticeStore = create<PracticeState>()(
           currentSession: null,
           sessionHistory: [completedSession, ...state.sessionHistory].slice(0, 20), // Keep last 20 sessions
         }))
+      },
+
+      // Add new function to submit review session results
+      submitReviewSession: async () => {
+        const currentSession = get().currentSession
+        if (!currentSession) return
+
+        set({ isLoading: true })
+
+        try {
+          // Get words from the current session
+          const sessionWords = currentSession.questions.map((q) => q.word)
+
+          // Submit the review words
+          const response = await submitReviewWords(sessionWords)
+
+          // Store the result
+          set({
+            reviewWordsResult: response.words,
+            isLoading: false,
+          })
+
+          // End the session
+          get().endSession()
+        } catch (error) {
+          console.error("Failed to submit review words:", error)
+          set({ isLoading: false })
+          // Still end the session even if submission fails
+          get().endSession()
+        }
+      },
+
+      clearReviewWordsResult: () => {
+        set({ reviewWordsResult: null })
       },
 
       answerQuestion: (questionId, answer) => {
@@ -311,16 +220,19 @@ export const usePracticeStore = create<PracticeState>()(
         set((state) => ({ showHints: !state.showHints }))
       },
 
-      // Mock data generation
-      generateMockQuestions: (count, mode) => {
-        // Shuffle and take a subset of mock words
-        const shuffled = [...mockWords].sort(() => 0.5 - Math.random())
-        const selectedWords = shuffled.slice(0, count)
+      // Replace mock data generation with real data
+      generateQuestionsFromReviewWords: (count, mode, reviewWords) => {
+        // Make sure we don't exceed available words
+        const availableCount = Math.min(count, reviewWords.length)
+        const selectedWords = reviewWords.slice(0, availableCount)
 
         // Generate questions based on mode
         switch (mode) {
           case "mixed":
-            return selectedWords.map((word, index) => {
+            return selectedWords.map((reviewWord, index) => {
+              // Extract the actual word data from the review word
+              const word = reviewWord.word
+
               // Alternate between different question types
               const questionTypes: QuestionType[] = [
                 "multiple-choice",
@@ -331,26 +243,26 @@ export const usePracticeStore = create<PracticeState>()(
               ]
               const type = questionTypes[index % questionTypes.length]
 
-              return createMockQuestion(word, type, mockWords)
+              return createQuestion(word, type, selectedWords.map((rw) => rw.word))
             })
 
           case "multiple-choice":
-            return selectedWords.map((word) => createMockQuestion(word, "multiple-choice", mockWords))
+            return selectedWords.map((rw) => createQuestion(rw.word, "multiple-choice", selectedWords.map((rw) => rw.word)))
 
           case "fill-blank":
-            return selectedWords.map((word) => createMockQuestion(word, "fill-blank", mockWords))
+            return selectedWords.map((rw) => createQuestion(rw.word, "fill-blank", selectedWords.map((rw) => rw.word)))
 
           case "listening":
-            return selectedWords.map((word) => createMockQuestion(word, "listening", mockWords))
+            return selectedWords.map((rw) => createQuestion(rw.word, "listening", selectedWords.map((rw) => rw.word)))
 
           case "matching":
-            return selectedWords.map((word) => createMockQuestion(word, "matching", mockWords))
+            return selectedWords.map((rw) => createQuestion(rw.word, "matching", selectedWords.map((rw) => rw.word)))
 
           case "drag-drop":
-            return selectedWords.map((word) => createMockQuestion(word, "drag-drop", mockWords))
+            return selectedWords.map((rw) => createQuestion(rw.word, "drag-drop", selectedWords.map((rw) => rw.word)))
 
           default:
-            return selectedWords.map((word) => createMockQuestion(word, "multiple-choice", mockWords))
+            return selectedWords.map((rw) => createQuestion(rw.word, "multiple-choice", selectedWords.map((rw) => rw.word)))
         }
       },
     }),
@@ -360,8 +272,8 @@ export const usePracticeStore = create<PracticeState>()(
   ),
 )
 
-// Helper function to create mock questions
-function createMockQuestion(word: Word, type: QuestionType, allWords: Word[]): PracticeQuestion {
+// Helper function to create questions from real data
+function createQuestion(word: any, type: QuestionType, allWords: any[]): PracticeQuestion {
   const baseQuestion = {
     id: Math.floor(Math.random() * 10000),
     word,

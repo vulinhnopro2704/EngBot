@@ -59,7 +59,7 @@ export const useAuthStore = create<AuthState>()(
 						}
 					);
 
-					// Save access token to localStorage
+					// Save both access and refresh tokens
 					if (response.access) {
 						localStorage.setItem("jwtAuth", response.access);
 					}
@@ -108,9 +108,13 @@ export const useAuthStore = create<AuthState>()(
 						}
 					);
 
-					// Save access token to localStorage
+					// Save both access and refresh tokens
 					if (response.access) {
 						localStorage.setItem("jwtAuth", response.access);
+					}
+
+					if (response.refresh) {
+						localStorage.setItem("refresh", response.refresh);
 					}
 
 					// Update state with user information
@@ -134,8 +138,9 @@ export const useAuthStore = create<AuthState>()(
 			},
 
 			logout: () => {
-				// Remove token from localStorage
+				// Remove tokens from localStorage
 				localStorage.removeItem("jwtAuth");
+				localStorage.removeItem("refresh");
 
 				// Reset auth state
 				set({

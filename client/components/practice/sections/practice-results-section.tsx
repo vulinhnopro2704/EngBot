@@ -11,10 +11,18 @@ import { usePracticeStore } from "@/lib/practice-store"
 import { Badge } from "@/components/ui/badge"
 import { MascotEncouragement } from "@/components/practice/ui/mascot-encouragement"
 import confetti from "canvas-confetti"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { AudioPlayer } from "../audio-player"
 
 export function PracticeResultsSection() {
   const router = useRouter()
-  const { currentSession, startSession } = usePracticeStore()
+  const { 
+    sessionHistory, 
+    reviewWordsResult,
+    clearReviewWordsResult,
+    currentSession, 
+    startSession 
+  } = usePracticeStore()
 
   // Redirect if no session data
   useEffect(() => {
@@ -55,6 +63,21 @@ export function PracticeResultsSection() {
     }
   }, [currentSession?.completed])
 
+  // Get the most recent session
+  const lastSession = sessionHistory[0]
+
+  // Handle case where there's no session data
+  useEffect(() => {
+    if (!lastSession && !reviewWordsResult) {
+      router.push("/practice")
+    }
+    
+    // Clear review results when navigating away
+    return () => {
+      clearReviewWordsResult()
+    }
+  }, [lastSession, reviewWordsResult, router, clearReviewWordsResult])
+
   if (!currentSession || !currentSession.completed) {
     return null
   }
@@ -94,6 +117,19 @@ export function PracticeResultsSection() {
   const handleBackToPractice = () => {
     router.push("/practice")
   }
+
+  const handleStartNewSession = () => {
+    router.push("/practice")
+  }
+
+  // Calculate stats from the session
+  const correctPercentage = lastSession 
+    ? Math.round((lastSession.correctAnswers / lastSession.questions.length) * 100) 
+    : 0
+  
+  const timeSpentReview = lastSession 
+    ? Math.round((lastSession.endTime?.getTime() ?? 0 - lastSession.startTime.getTime()) / 1000) 
+    : 0
 
   return (
     <motion.div
@@ -279,6 +315,157 @@ export function PracticeResultsSection() {
           <ArrowRight className="mr-2 h-4 w-4" /> Back to Practice
         </Button>
       </div>
+
+      {/* Review Results Section */}
+      {lastSession && (
+        <div className="container max-w-5xl py-8 space-y-8">
+          <div className="text-center space-y-4">
+            <h1 className="text-3xl font-bold">Practice Complete!</h1>
+            <p className="text-muted-foreground">
+              Great job! You've completed your practice session.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xl">Score</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-4xl font-bold">{correctPercentage}%</div>
+                <p className="text-muted-foreground">
+                  {lastSession.correctAnswers} of {lastSession.questions.length} correct
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xl">Time</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-4xl font-bold">{timeSpentReview}s</div>
+                <p className="text-muted-foreground">
+                  {Math.round(timeSpentReview / lastSession.questions.length)}s per word
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xl">Mode</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold capitalize">{lastSession.mode}</div>
+                <p className="text-muted-foreground">
+                  {lastSession.questions.length} words
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {reviewWordsResult && reviewWordsResult.length > 0 && (
+            <Tabs defaultValue="words" className="w-full">
+              <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
+                <TabsTrigger value="words">Reviewed Words</TabsTrigger>
+                <TabsTrigger value="stats">Statistics</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="words" className="mt-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {reviewWordsResult.map(item => (
+                    <Card key={item.id} className="overflow-hidden">
+                      <CardHeader className="pb-2 flex flex-row items-center justify-between">
+                        <div>
+                          <CardTitle className="text-xl">{item.word.word}</CardTitle>
+                          <p className="text-muted-foreground text-sm">
+                            {item.word.pronunciation} · <span className="uppercase">{item.word.pos}</span>
+                          </p>
+                        </div>
+                        {item.word.audio && (
+                          <AudioPlayer 
+                            src={item.word.audio}
+                            className="h-8 w-8"
+                          />
+                        )}
+                      </CardHeader>
+                      <CardContent className="space-y-2">
+                        <div>
+                          <div className="font-medium">Meaning</div>
+                          <p>{item.word.meaning}</p>
+                        </div>
+                        
+                        <div>
+                          <div className="font-medium">Example</div>
+                          <p className="text-sm">{item.word.example}</p>
+                          <p className="text-sm text-muted-foreground">{item.word.example_vi}</p>
+                        </div>
+                        
+                        <div className="flex flex-wrap gap-2 pt-2">
+                          <Badge variant="outline">Level {item.level}</Badge>
+                          <Badge variant="outline">Streak {item.streak}</Badge>
+                          <Badge>{item.word.cefr}</Badge>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="stats" className="mt-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Review Progress</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div>
+                        <h3 className="font-medium">Words by Level</h3>
+                        <ul className="mt-2 space-y-1">
+                          {Array.from(new Set(reviewWordsResult.map(w => w.level))).sort().map(level => (
+                            <li key={level} className="flex justify-between">
+                              <span>Level {level}</span>
+                              <span>{reviewWordsResult.filter(w => w.level === level).length} words</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      
+                      <div>
+                        <h3 className="font-medium">Words by CEFR</h3>
+                        <ul className="mt-2 space-y-1">
+                          {Array.from(new Set(reviewWordsResult.map(w => w.word.cefr))).sort().map(cefr => (
+                            <li key={cefr} className="flex justify-between">
+                              <span>CEFR {cefr}</span>
+                              <span>{reviewWordsResult.filter(w => w.word.cefr === cefr).length} words</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      
+                      <div>
+                        <h3 className="font-medium">Next Review Times</h3>
+                        <ul className="mt-2 space-y-1">
+                          {reviewWordsResult.slice(0, 5).map(item => (
+                            <li key={item.id} className="flex justify-between">
+                              <span>{item.word.word}</span>
+                              <span>{new Date(item.next_review).toLocaleDateString()}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          )}
+
+          <div className="flex justify-center pt-6">
+            <Button size="lg" onClick={handleStartNewSession}>
+              Practice More Words
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Mascot encouragement */}
       <MascotEncouragement
