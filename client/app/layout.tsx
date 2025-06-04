@@ -22,6 +22,9 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en" suppressHydrationWarning>
+			<head>
+			<script src="https://code.responsivevoice.org/responsivevoice.js?key=907yQQYW"></script>
+			</head>
 			<body className={inter.className}>
 				<ThemeProvider
 					attribute="class"

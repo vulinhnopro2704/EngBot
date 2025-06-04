@@ -10,15 +10,19 @@ export const metadata = {
 export default function ChatPage() {
   return (
     <AppLayout>
-    <Shell>
-      <div className="flex flex-col items-center justify-center w-full max-w-5xl mx-auto px-4 py-6">
-        <h1 className="text-3xl font-bold text-center mb-2">English Learning Chat</h1>
-        <p className="text-muted-foreground text-center mb-8">
-          Chat with EngBot to improve your English skills. The AI will correct your grammar and offer suggestions.
-        </p>
-        <EnglishChatInterface />
-      </div>
-    </Shell>
+      <Shell className="px-0 py-0 max-w-none">
+        <div className="flex flex-col w-full h-[calc(100vh-4rem)]">
+          <div className="px-4 py-4 border-b bg-background">
+            <h1 className="text-2xl font-bold">English Learning Chat</h1>
+            <p className="text-muted-foreground">
+              Chat with EngBot to improve your English skills. The AI will correct your grammar and offer suggestions.
+            </p>
+          </div>
+          <div className="flex-1 overflow-hidden">
+            <EnglishChatInterface className="h-full rounded-none border-0" />
+          </div>
+        </div>
+      </Shell>
     </AppLayout>
   );
 }
