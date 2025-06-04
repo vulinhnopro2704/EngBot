@@ -17,6 +17,7 @@ interface ApiErrorResponse {
 
 interface RefreshTokenResponse {
 	access: string;
+	refresh?: string;
 }
 
 // Type guard to check if an error is an AxiosError
@@ -67,12 +68,25 @@ const refreshToken = async (): Promise<string | null> => {
 			{ headers: { "Content-Type": "application/json" } }
 		);
 
-		const newToken = response.data.access;
-		localStorage.setItem("jwtAuth", newToken);
-		return newToken;
+		const newAccessToken = response.data.access;
+		localStorage.setItem("jwtAuth", newAccessToken);
+		
+		// If the refresh endpoint also returns a new refresh token, update it
+		if (response.data.refresh) {
+			localStorage.setItem("refresh", response.data.refresh);
+		}
+		
+		return newAccessToken;
 	} catch (error) {
+		// If refresh token is expired or invalid, clear tokens and redirect to login
 		localStorage.removeItem("jwtAuth");
 		localStorage.removeItem("refresh");
+		
+		// Redirect to login page
+		if (typeof window !== 'undefined') {
+			window.location.href = '/login';
+		}
+		
 		return null;
 	}
 };
@@ -106,6 +120,14 @@ apiClient.interceptors.response.use(
 
 			// Skip refresh for refresh token request itself
 			if (originalConfig.url === ENDPOINTS.AUTH.REFRESH) {
+				// Refresh token is expired, redirect to login
+				localStorage.removeItem("jwtAuth");
+				localStorage.removeItem("refresh");
+				
+				if (typeof window !== 'undefined') {
+					window.location.href = '/login';
+				}
+				
 				return Promise.reject(error);
 			}
 

@@ -47,9 +47,10 @@ export const ENDPOINTS = {
 		ID: (id: string): string => `${BACKEND_URL}/user_words/${id}`,
 		COUNT_WORDS_BY_LEVEL: (level: number): string =>
 			`${BACKEND_URL}/user_words/count_by_level/${level}/`,
+		COUNT_ALL_WORDS_BY_LEVEL: `${BACKEND_URL}/user-words/count_words-by-level/`,
 		GET_WORDS: `${BACKEND_URL}/user_words/get_words/`,
 		LEARNED_WORDS: `${BACKEND_URL}/user_words/learned_words/`,
-		REVIEW_WORDS: `${BACKEND_URL}/user_words/review_words/`,
+		REVIEW_WORDS: `${BACKEND_URL}/user-words/review-words/`,
 		SUBMIT_WORDS: `${BACKEND_URL}/user-words/submit-words/`,
 	},
 };
