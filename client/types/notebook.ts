@@ -47,8 +47,3 @@ export interface LearnedWordsPaginationResponse {
   previous: string | null
   results: LearnedWord[]
 }
-
-// Words list props
-export interface WordsListProps {
-  onComplete?: () => void
-}

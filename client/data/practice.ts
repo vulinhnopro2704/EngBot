@@ -1,23 +1,23 @@
 import { v4 as uuidv4 } from "uuid"
-import type { PracticeQuestion, PracticeSession, QuestionType, VocabularyWord } from "@/data/types"
+import type { PracticeQuestion, PracticeSession, QuestionType, Word } from "@/data/types"
 import { getRandomVocabularyWords, getVocabularyWords } from "@/data/vocabulary"
 
 // Generate multiple choice options for a word
-export function generateMultipleChoiceOptions(correctWord: VocabularyWord, allWords: VocabularyWord[]): string[] {
+export function generateMultipleChoiceOptions(correctWord: Word, allWords: Word[]): string[] {
   // Filter out the correct word and get 3 random incorrect options
   const incorrectWords = allWords
     .filter((word) => word.id !== correctWord.id)
     .sort(() => 0.5 - Math.random())
     .slice(0, 3)
-    .map((word) => word.definition)
+    .map((word) => word.meaning)
 
   // Add the correct answer and shuffle
-  const options = [...incorrectWords, correctWord.definition]
+  const options = [...incorrectWords, correctWord.meaning]
   return options.sort(() => 0.5 - Math.random())
 }
 
 // Generate a fill-in-the-blank sentence
-export function generateFillBlankSentence(word: VocabularyWord): string {
+export function generateFillBlankSentence(word: Word): string {
   if (!word.example) {
     return `Please use the word "${word.word}" in a sentence.`
   }
@@ -28,7 +28,7 @@ export function generateFillBlankSentence(word: VocabularyWord): string {
 }
 
 // Generate matching pairs for a word
-export function generateMatchingPairs(word: VocabularyWord, allWords: VocabularyWord[]): any[] {
+export function generateMatchingPairs(word: Word, allWords: Word[]): any[] {
   // Get 5 additional random words
   const additionalWords = allWords
     .filter((w) => w.id !== word.id)
@@ -47,7 +47,7 @@ export function generateMatchingPairs(word: VocabularyWord, allWords: Vocabulary
 }
 
 // Generate a sentence for drag-drop exercise
-export function generateDragDropSentence(word: VocabularyWord): { sentence: string; dragWords: string[] } {
+export function generateDragDropSentence(word: Word): { sentence: string; dragWords: string[] } {
   if (!word.example) {
     const sentence = `The ${word.word} is a ${word.type || "word"} that means ${word.definition || word.meaning}.`
     return {
@@ -79,9 +79,9 @@ export function generateDragDropSentence(word: VocabularyWord): { sentence: stri
 
 // Generate a practice question
 export function generatePracticeQuestion(
-  word: VocabularyWord,
+  word: Word,
   type: QuestionType,
-  allWords: VocabularyWord[],
+  allWords: Word[],
 ): PracticeQuestion {
   switch (type) {
     case "multiple-choice":

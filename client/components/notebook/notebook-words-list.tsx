@@ -146,8 +146,15 @@ export function NotebookWordsList() {
   const handlePlayPronunciation = (word: LearnedWord) => {
     if (word.word.audio) {
       playAudio(word.word.audio)
+    } else if (typeof window !== 'undefined' && window.responsiveVoice) {
+      // Use ResponsiveVoice for more reliable TTS
+      window.responsiveVoice.speak(word.word.word, "UK English Female", {
+        pitch: 1,
+        rate: 0.8,
+        volume: 1
+      })
     } else {
-      // Fallback to text-to-speech
+      // Fallback to browser's SpeechSynthesis
       const utterance = new SpeechSynthesisUtterance(word.word.word)
       utterance.lang = 'en-US'
       speechSynthesis.speak(utterance)

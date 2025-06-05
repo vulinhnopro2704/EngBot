@@ -1,6 +1,6 @@
+import { Word } from "@/data/types";
 import { apiPost, apiGet } from "@/lib/api-client";
 import { ENDPOINTS } from "@/lib/endpoint";
-import { Word } from "@/types/words";
 
 type SubmitWordItem = {
 	word_id: number;
@@ -69,12 +69,11 @@ export const submitReviewWords = async (words: Word[]): Promise<ReviewWordsRespo
 		word_id: word.id,
 		level: word.level || 1,
 		streak: word.streak || 1,
-		question_type: "review",
+		question_type: "L1",
 	}));
 
-	const payload: Omit<SubmitWordsRequest, "lesson_id"> & { lesson_id: null } = {
+	const payload: Omit<SubmitWordsRequest, "lesson_id"> = {
 		is_review: true,
-		lesson_id: null,
 		words: formattedWords,
 	};
 

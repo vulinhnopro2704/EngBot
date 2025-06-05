@@ -1,5 +1,4 @@
-import type { VocabularyWord } from "./vocabulary";
-import { Word } from "./words";
+import {Word} from "@/data/types";
 
 // Lesson types
 export type Lesson = {
@@ -18,11 +17,6 @@ export interface ModuleProps {
 	words: Word[];
 }
 
-// Flashcard module props
-export interface FlashcardModuleProps extends ModuleProps {
-	onComplete?: () => void;
-}
-
 // Listening module props
 export interface ListeningModuleProps extends ModuleProps {
 	onComplete?: () => void;
@@ -37,12 +31,4 @@ export interface FillBlankModuleProps extends ModuleProps {
 export interface LessonPageProps {
 	courseId: number;
 	lessonId: number;
-}
-
-// Lesson view props
-export interface LessonViewProps {
-	courseId: number;
-	lessonId: number;
-	lesson: Lesson;
-	words: VocabularyWord[];
 }

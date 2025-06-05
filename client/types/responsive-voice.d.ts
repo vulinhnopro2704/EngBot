@@ -4,6 +4,7 @@ interface ResponsiveVoiceParameters {
   volume?: number; // 0 to 1
   onstart?: () => void;
   onend?: () => void;
+  onerror?: (error: any) => void; // Add error callback
 }
 
 interface ResponsiveVoice {
@@ -16,8 +17,6 @@ interface ResponsiveVoice {
   getVoices(): string[];
   setDefaultVoice(voice: string): void;
   setDefaultRate(rate: number): void;
-}
-
-interface Window {
-  responsiveVoice: ResponsiveVoice;
+  setDefaultPitch(pitch: number): void; // Add missing method
+  setDefaultVolume(volume: number): void; // Add missing method
 }

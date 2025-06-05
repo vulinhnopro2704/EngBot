@@ -27,7 +27,7 @@ interface PracticeState {
   startSession: (mode: PracticeMode, wordCount?: number) => Promise<void>
   endSession: () => void
   submitReviewSession: () => Promise<void>
-  answerQuestion: (questionId: number, answer: string) => boolean
+  answerQuestion: (questionId: number, answer: string, autoAdvance?: boolean) => boolean
   moveToNextQuestion: () => void
   incrementStreak: () => void
   resetStreak: () => void
@@ -56,7 +56,7 @@ export const usePracticeStore = create<PracticeState>()(
       reviewWordsResult: null,
 
       // Actions
-      startSession: async (mode, wordCount = 10) => {
+      startSession: async (mode, wordCount) => {
         set({ isLoading: true })
 
         try {
@@ -65,7 +65,13 @@ export const usePracticeStore = create<PracticeState>()(
           const reviewWords = response.words || []
 
           // Limit to the requested word count
-          const selectedWords = reviewWords.slice(0, wordCount)
+          let selectedWords;
+          if (wordCount) {
+            selectedWords = reviewWords.slice(0, wordCount)
+          }
+          else {
+            selectedWords = reviewWords
+          }
 
           if (selectedWords.length === 0) {
             console.error("No review words available")
@@ -132,6 +138,17 @@ export const usePracticeStore = create<PracticeState>()(
 
           // End the session
           get().endSession()
+          
+          // Ensure we mark the session as completed for the results page
+          const completedSession = {
+            ...currentSession,
+            completed: true,
+            endTime: new Date(),
+          }
+          
+          set((state) => ({
+            sessionHistory: [completedSession, ...state.sessionHistory].slice(0, 20),
+          }))
         } catch (error) {
           console.error("Failed to submit review words:", error)
           set({ isLoading: false })
@@ -144,7 +161,7 @@ export const usePracticeStore = create<PracticeState>()(
         set({ reviewWordsResult: null })
       },
 
-      answerQuestion: (questionId, answer) => {
+      answerQuestion: (questionId, answer, autoAdvance = true) => {
         const { currentSession } = get()
         if (!currentSession) return false
 
@@ -168,6 +185,10 @@ export const usePracticeStore = create<PracticeState>()(
               timestamp: new Date(),
             },
           ],
+          // Mark the current question as answered
+          questions: currentSession.questions.map((q, idx) => 
+            idx === questionIndex ? { ...q, answered: true } : q
+          ),
         }
 
         set({
@@ -175,6 +196,13 @@ export const usePracticeStore = create<PracticeState>()(
           totalCorrect: get().totalCorrect + (isCorrect ? 1 : 0),
           totalIncorrect: get().totalIncorrect + (!isCorrect ? 1 : 0),
         })
+
+        // Automatically move to the next question after a delay if autoAdvance is true
+        if (autoAdvance) {
+          setTimeout(() => {
+            get().moveToNextQuestion()
+          }, 1500) // 1.5 second delay
+        }
 
         return isCorrect
       },
@@ -279,6 +307,7 @@ function createQuestion(word: any, type: QuestionType, allWords: any[]): Practic
     word,
     type,
     correctAnswer: type === "multiple-choice" ? word.meaning : word.word,
+    answered: false, // Add this property to track if question is answered
   }
 
   switch (type) {
@@ -325,10 +354,10 @@ function createQuestion(word: any, type: QuestionType, allWords: any[]): Practic
       const dragWords = [
         word.word,
         ...words
-          .filter((w) => w.length > 3 && w.toLowerCase() !== word.word.toLowerCase())
+          .filter((w : string) => w.length > 3 && w.toLowerCase() !== word.word.toLowerCase())
           .sort(() => 0.5 - Math.random())
           .slice(0, 2)
-          .map((w) => w.replace(/[.,!?;:]/g, "")),
+          .map((w : string) => w.replace(/[.,!?;:]/g, "")),
       ]
 
       return {

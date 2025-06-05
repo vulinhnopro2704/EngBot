@@ -1,5 +1,4 @@
 import type { VocabularyWord } from "./vocabulary"
-import type { Word } from "./lessons"
 
 // Practice modes
 export type PracticeMode = "mixed" | "multiple-choice" | "fill-blank" | "listening" | "matching" | "drag-drop"
@@ -11,7 +10,7 @@ export type QuestionType = "multiple-choice" | "fill-blank" | "listening" | "mat
 export interface PracticeQuestion {
   id: number
   type: QuestionType
-  word: VocabularyWord | Word
+  word: VocabularyWord
   correctAnswer: string
   options?: string[]
   pairs?: any[] // This should be properly typed based on the actual structure
