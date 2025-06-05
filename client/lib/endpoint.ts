@@ -55,3 +55,10 @@ export const ENDPOINTS = {
 		SUBMIT_WORDS: `${BACKEND_URL}/user-words/submit-words/`,
 	},
 };
+
+export const MOCHI_ENDPOINTS = {
+	// Key is the English word, language is the target language (default is Vietnamese), type is the type of dictionary (default is web), and definition is the definition level (default is 0)
+	DICTIONARY: (key: string, language: string = "vi", type: string = "web", definition : number = 0) => {
+		return `https://mochien-server-release.mochidemy.com/api/v5.0/words/dictionary-english?language=${language}&key=${key}&type=${type}&definition=${definition}`;
+	}
+}

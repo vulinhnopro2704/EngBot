@@ -17,6 +17,7 @@ import {
 	Heart,
 	Diamond,
 	MessageSquare,
+	Search,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -46,6 +47,12 @@ const navigationItems = [
 		label: "Notebook",
 		path: "/notebook",
 		section: "notebook",
+	},
+	{
+		icon: Search,
+		label: "Dictionary",
+		path: "/dictionary",
+		section: "dictionary",
 	},
 	{
 		icon: MessageSquare,
