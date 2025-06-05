@@ -43,11 +43,29 @@ export function EnglishChatInterface({
   const [transcript, setTranscript] = useState("");
   const [isSpeaking, setIsSpeaking] = useState(false);
   
-  const { start: startSpeechRecognition, stop: stopSpeechRecognition } = 
-    useBrowserSpeechRecognition(
+  // Create speech recognition only once with useRef
+  const speechRecognitionRef = useRef<{
+    start: () => void;
+    stop: () => void;
+  } | null>(null);
+  
+  // Initialize speech recognition on component mount
+  useEffect(() => {
+    speechRecognitionRef.current = useBrowserSpeechRecognition(
       (text) => setTranscript(text),
-      () => setIsListening(false)
+      () => {
+        console.log("Speech recognition ended callback triggered");
+        setIsListening(false);
+      }
     );
+    
+    // Cleanup on unmount
+    return () => {
+      if (speechRecognitionRef.current) {
+        speechRecognitionRef.current.stop();
+      }
+    };
+  }, []);
 
   // Auto-scroll to bottom when new messages are added
   useEffect(() => {
@@ -58,15 +76,20 @@ export function EnglishChatInterface({
 
   const toggleVoiceMode = () => {
     if (isListening) {
-      stopSpeechRecognition();
+      speechRecognitionRef.current?.stop();
       setIsListening(false);
     }
     setIsVoiceMode(!isVoiceMode);
   };
 
   const toggleListening = () => {
+    if (!speechRecognitionRef.current) {
+      console.error("Speech recognition not initialized");
+      return;
+    }
+    
     if (isListening) {
-      stopSpeechRecognition();
+      speechRecognitionRef.current.stop();
       setIsListening(false);
       // If we have transcript, set it as input value
       if (transcript.trim()) {
@@ -75,8 +98,9 @@ export function EnglishChatInterface({
     } else {
       setTranscript("");
       setInputValue("");
-      startSpeechRecognition();
+      speechRecognitionRef.current.start();
       setIsListening(true);
+      console.log("Started listening");
     }
   };
 
@@ -121,7 +145,7 @@ export function EnglishChatInterface({
     setIsLoading(true);
     
     if (isListening) {
-      stopSpeechRecognition();
+      speechRecognitionRef?.current?.stop();
       setIsListening(false);
     }
     

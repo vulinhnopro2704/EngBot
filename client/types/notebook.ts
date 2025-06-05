@@ -14,26 +14,41 @@ export interface NotebookEntry extends VocabularyWord {
   nextReview?: Date | string | null
 }
 
-// Notebook entry card props
-export interface NotebookEntryCardProps {
-  entry: NotebookEntry
-  onToggleFavorite: () => void
+// API Word type (from backend)
+export interface ApiWord {
+  id: number
+  word: string
+  pronunciation: string | null
+  pos: string
+  meaning: string
+  example: string
+  exampleVi: string
+  image: string | null
+  audio: string | null
+  cefr: string
 }
 
-// Add word dialog props
-export interface AddWordDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
+// Learned Word type (from backend)
+export interface LearnedWord {
+  id: number
+  word: ApiWord
+  level: number
+  nextReview: string
+  lastReview: string
+  streak: number
+  learnedAt: string
+  user: number
 }
 
-// Edit word dialog props
-export interface EditWordDialogProps {
-  entry: NotebookEntry
-  open: boolean
-  onOpenChange: (open: boolean) => void
+// Learned Words Pagination API response
+export interface LearnedWordsPaginationResponse {
+  count: number
+  next: string | null
+  previous: string | null
+  results: LearnedWord[]
 }
 
-// Vocabulary review props
-export interface VocabularyReviewProps {
-  onComplete: () => void
+// Words list props
+export interface WordsListProps {
+  onComplete?: () => void
 }
