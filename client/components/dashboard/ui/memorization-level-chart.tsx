@@ -9,7 +9,7 @@ import { apiGet } from "@/lib/api-client"
 import { ENDPOINTS } from "@/lib/endpoint"
 
 // Interface for memory level data from API
-interface MemoryLevelData {
+export interface MemoryLevelData {
   levelCounts: {
     [key: string]: number
   }
