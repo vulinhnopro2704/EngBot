@@ -258,10 +258,10 @@ export function useAudio() {
           // Create an audio element
           const audio = new Audio(audioUrl)
 
-          // Set up error handling
+          // Set up error handling with specific fallback
           audio.onerror = (e) => {
             console.error(`Error loading audio from ${audioUrl}:`, e)
-            // Use the mapped sound type if available, otherwise use a generic effect
+            // Use the synthetic sound fallback since file is missing
             if (soundType) {
               playSound(soundType)
             } else {

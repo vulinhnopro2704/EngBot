@@ -11,8 +11,8 @@ import type {
   PracticeSession,
   PracticeHistory,
   NotebookEntry,
-  VocabularyWord,
   MemorizationLevel,
+  Word,
 } from "@/data/types"
 import { recentActivities } from "@/data/activities"
 import { createPracticeSession, calculatePracticeScore, calculateTimeSpent } from "@/data/practice"
@@ -77,7 +77,7 @@ type VocabState = {
 
   // Notebook
   notebookEntries: NotebookEntry[]
-  addToNotebook: (word: VocabularyWord, source: "lesson" | "manual" | "practice", sourceDetails?: string) => void
+  addToNotebook: (word: Word, source: "lesson" | "manual" | "practice", sourceDetails?: string) => void
   removeFromNotebook: (id: number) => void
   updateNotebookEntry: (id: number, updates: Partial<NotebookEntry>) => void
   toggleFavorite: (id: number) => void

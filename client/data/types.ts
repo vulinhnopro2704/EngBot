@@ -15,10 +15,13 @@ export type Word = {
 	pos: string; // Part of speech ("adv", "n", "phrase", "phrV", "adj", "v", etc.)
 	meaning: string;
 	example: string;
-	example_vi: string;
+	exampleVi: string;
 	image: string;
 	audio: string; // URL to audio pronunciation
 	cefr: string; // CEFR level, e.g., "A1", "B2"
+	level?: number; // Memorization level (1-5)
+	streak?: number; // Current streak for the word
+	notes?: string; // User notes for the word
 };
 
 
@@ -38,42 +41,20 @@ export type UserLesson = {
 };
 
 export type UserWord = {
-	user: number;
-	word: number;
-	level?: number;
-	next_review?: string;
-	last_review?: string;
-	streak?: number;
-	learned_at?: string;
+	id?: number; // Unique identifier for the user word entry
+	word: Word; // The word object
+	level: MemorizationLevel; // Memorization level (1-5)
+	nextReview?: string; // Date String ISO 8601 format for the next review
+	lastReview?: number; // Number of times the word has been reviewed
+	streak?: number; // Current streak for the word
+	learnedAt?: string; // Date String ISO 8601 format for when the word was learned
+	user: number; // User ID
 };
 
 // CEFR levels for language proficiency
 export type CEFRLevel = "A1" | "A2" | "B1" | "B2" | "C1" | "C2";
 export type MemorizationLevel = 1 | 2 | 3 | 4 | 5;
 
-// Legacy types for compatibility
-export interface VocabularyWord {
-	id: number;
-	word: string;
-	definition: string;
-	definitionVi?: string;
-	phonetic?: string;
-	example?: string;
-	exampleVi?: string;
-	wordType: WordType;
-	imageUrl?: string;
-	relatedWords?: string[];
-	isFavorite?: boolean;
-	notes?: string;
-	cefr?: CEFRLevel;
-	level?: MemorizationLevel;
-	dateAdded?: Date | string;
-	source?: string;
-	sourceDetails?: string;
-	reviewCount?: number;
-	lastReviewed?: Date | string | null;
-	nextReview?: Date | string | null;
-}
 
 export type WordType =
 	| "noun"
@@ -86,7 +67,7 @@ export type WordType =
 	| "interjection"
 	| "phrase";
 
-export interface NotebookEntry extends VocabularyWord {
+export interface NotebookEntry extends Word {
 	dateAdded: Date | string;
 	source: string;
 	sourceDetails?: string;
@@ -129,13 +110,14 @@ export type QuestionType =
 	| "fill-blank"
 	| "listening"
 	| "matching"
-	| "drag-drop";
+	| "drag-drop"
+	| "listening-choice";
 
 // Update the PracticeQuestion type to include fields for our new question types
-export interface PracticeQuestion {
+export interface PracticeQuestion  {
 	id: number;
 	type: QuestionType;
-	word: VocabularyWord;
+	word: Word;
 	options?: string[];
 	correctAnswer: string;
 	pairs?: any[]; // For matching exercise
@@ -144,17 +126,6 @@ export interface PracticeQuestion {
 }
 
 export type PracticeMode = "mixed" | QuestionType;
-
-export type PracticeQuestion_OLD = {
-	id: number;
-	type: QuestionType;
-	word: Word;
-	correctAnswer: string;
-	options?: string[];
-	pairs?: { id: string; text: string; matchId: string }[];
-	sentence?: string;
-	dragWords?: string[];
-};
 
 export type QuestionResult = {
 	questionId: number;
