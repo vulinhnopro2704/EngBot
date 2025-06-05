@@ -1,7 +1,6 @@
 # Bỏ qua môi trường ảo
 venv/
-*.pyc
-__pycache__/
+*.pyc                                                                                                                                                                                                       
 
 # Bỏ qua file cấu hình môi trường
 .env
