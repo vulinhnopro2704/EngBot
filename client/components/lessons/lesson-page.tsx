@@ -15,8 +15,8 @@ import { LessonTabs } from "@/components/lessons/ui/lesson-tabs";
 import { getLessonById, getWordsByLessonId } from "@/service/lesson";
 import { submitLessonWords } from "@/service/word";
 import type { LessonPageProps } from "@/types/lessons";
-import { Word } from "@/types/words";
 import { toast } from "sonner";
+import { Word } from "@/data/types";
 
 export function LessonPage({ courseId, lessonId }: LessonPageProps) {
 	const router = useRouter();
@@ -79,8 +79,7 @@ export function LessonPage({ courseId, lessonId }: LessonPageProps) {
 			recordActivity(courseId, lessonId, "completed_lesson", 5);
 			playAudio("/sounds/success.mp3");
 
-			// Optionally navigate to a completion screen or back to course
-			// router.push(`/courses/${courseId}`);
+			router.push(`/courses/${courseId}`);
 		} catch (error) {
 			console.error("Error submitting lesson words:", error);
 			toast.error("Failed to complete lesson. Please try again.");
