@@ -15,6 +15,15 @@ import { motion } from "framer-motion"
 import { useAudio } from "@/hooks/use-audio"
 import { getCEFRLevelClasses, getMemorizationLevelClasses } from "@/lib/vocabulary-utils"
 
+// Declare the responsiveVoice type for the window object
+declare global {
+  interface Window {
+    responsiveVoice: {
+      speak: (text: string, voice: string, options?: any) => void;
+    }
+  }
+}
+
 export function NotebookWordsList() {
   // State for the word data
   const [wordsList, setWordsList] = useState<LearnedWord[]>([])
@@ -71,9 +80,9 @@ export function NotebookWordsList() {
       
       // Update state based on the response
       if (reset) {
-        setWordsList(data)
+        setWordsList(data.results ?? [])
       } else {
-        setWordsList((prev) => [...prev, ...data])
+        setWordsList((prev) => [...prev, ...data.results ?? []])
       }
 
       setTotalWords(data.count)

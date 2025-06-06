@@ -6,6 +6,7 @@ import { NavigationProgress } from "@/components/ui/navigation-progress";
 import "./globals.css";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { QueryProvider } from "@/providers/query-provider";
+import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -33,12 +34,13 @@ export default function RootLayout({
 					enableSystem
 					disableTransitionOnChange
 					storageKey="engbot-theme"
-				>
+				>	
 					<QueryProvider>
 						<NavigationProgress />
 						<SidebarProvider>{children}</SidebarProvider>
 					</QueryProvider>
 				</ThemeProvider>
+				<Toaster />
 			</body>
 		</html>
 	);
