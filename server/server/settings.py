@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 load_dotenv()
-# load_dotenv(os.path.join(BASE_DIR, './backend/.env.local'))
+# load_dotenv(os.path.join(BASE_DIR, './server/.env.local'))
 
 # print(os.getenv("SSLMODE"))
 
@@ -135,7 +135,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ]
 
-ROOT_URLCONF = 'backend.urls'
+ROOT_URLCONF = 'server.urls'
 
 TEMPLATES = [
     {
@@ -176,7 +176,7 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-WSGI_APPLICATION = 'backend.wsgi.application'
+WSGI_APPLICATION = 'server.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
