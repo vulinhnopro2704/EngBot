@@ -61,7 +61,7 @@ export function SpacedRepetitionTab({ handleStartPractice }: SpacedRepetitionTab
 
         <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
           <Button
-            onClick={() => handleStartPractice("mixed")}
+            onClick={() => handleStartPractice("spaced")}
             className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white shadow-md"
             size="lg"
           >

@@ -125,7 +125,7 @@ export interface PracticeQuestion  {
 	dragWords?: string[]; // For drag-drop exercise
 }
 
-export type PracticeMode = "mixed" | QuestionType;
+export type PracticeMode = "mixed" | "spaced" | QuestionType;
 
 export type QuestionResult = {
 	questionId: number;
